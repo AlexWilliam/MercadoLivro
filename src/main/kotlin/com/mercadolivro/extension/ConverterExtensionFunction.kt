@@ -20,6 +20,11 @@ fun PostBookRequest.toBookModel(customer: CustomerModel): BookModel {
     return BookModel(name=this.name, price=this.price, status=BookStatus.ATIVO, customer=customer)
 }
 
-fun PutBookRequest.toBookModel(id: Int, customer: CustomerModel): BookModel{
-    return BookModel(id=id, name=this.name, price=this.price, status=BookStatus.ATIVO, customer=customer)
+fun PutBookRequest.toBookModel(book: BookModel, customer: CustomerModel): BookModel{
+    return BookModel(
+        id=book.id,
+        name=this.name ?: book.name,
+        price=this.price ?: book.price,
+        status=BookStatus.ATIVO ?: book.status,
+        customer=customer ?: book.customer)
 }

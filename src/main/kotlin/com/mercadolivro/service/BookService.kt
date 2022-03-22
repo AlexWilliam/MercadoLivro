@@ -1,5 +1,6 @@
 package com.mercadolivro.service
 
+import com.mercadolivro.enums.BookStatus
 import com.mercadolivro.model.BookModel
 import com.mercadolivro.model.CustomerModel
 import com.mercadolivro.repository.BookRepository
@@ -11,15 +12,19 @@ class BookService(
     val bookRepository: BookRepository
 ) {
 
-    fun getAll(): List<BookModel> {
+    fun findAll(): List<BookModel> {
         return bookRepository.findAll().toList()
+    }
+
+    fun findActives(): List<BookModel> {
+        return bookRepository.findByStatus(BookStatus.ATIVO)
     }
 
     fun create(book: BookModel) {
         bookRepository.save(book)
     }
 
-    fun getById(id: Int): BookModel {
+    fun findById(id: Int): BookModel {
         return bookRepository.findById(id).orElseThrow()
     }
 
@@ -32,10 +37,14 @@ class BookService(
     }
 
     fun delete(id: Int){
+        var book = findById(id)
+
+        book.status = BookStatus.CANCELADO
+
         if(!bookRepository.existsById(id!!)){
             throw Exception()
         }
 
-        bookRepository.deleteById(id)
+        bookRepository.save(book)
     }
 }

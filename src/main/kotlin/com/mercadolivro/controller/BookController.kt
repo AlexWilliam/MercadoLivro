@@ -23,16 +23,21 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("book")
+@RequestMapping("books")
 class BookController (
     val bookService: BookService,
     val customerService: CustomerService
 ) {
 
-//    @GetMapping
-//    fun getAll(@RequestParam name: String?): List<BookModel> {
-//        return bookService.getAll(name)
-//    }
+    @GetMapping
+    fun findAll(): List<BookModel> {
+        return bookService.findAll()
+    }
+
+    @GetMapping("/active")
+    fun findActives(): List<BookModel> {
+        return bookService.findActives()
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,14 +49,16 @@ class BookController (
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.FOUND)
-    fun getCustomer(@PathVariable id: Int): BookModel {
-        return bookService.getById(id)
+    fun findById(@PathVariable id: Int): BookModel {
+        return bookService.findById(id)
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun update(@PathVariable id: Int, @RequestBody book: PutBookRequest, customer: CustomerModel){
-        bookService.update(book.toBookModel(id, customer))
+    fun update(@PathVariable id: Int, @RequestBody book: PutBookRequest){
+        val customer = customerService.getById(book.customerId!!)
+        val bookSaved = bookService.findById(id)
+        bookService.update(book.toBookModel(bookSaved, customer))
     }
 
     @DeleteMapping("/{id}")

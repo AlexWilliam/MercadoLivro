@@ -1,9 +1,14 @@
 package com.mercadolivro.controller
 
+import com.mercadolivro.controller.request.PostBookRequest
 import com.mercadolivro.controller.request.PostCustomerRequest
+import com.mercadolivro.controller.request.PutBookRequest
 import com.mercadolivro.controller.request.PutCustomerRequest
+import com.mercadolivro.extension.toBookModel
 import com.mercadolivro.extension.toCustomerModel
+import com.mercadolivro.model.BookModel
 import com.mercadolivro.model.CustomerModel
+import com.mercadolivro.service.BookService
 import com.mercadolivro.service.CustomerService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -18,37 +23,40 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("customers")
-class CustomerController (
+@RequestMapping("book")
+class BookController (
+    val bookService: BookService,
     val customerService: CustomerService
 ) {
 
-    @GetMapping
-    fun getAll(@RequestParam name: String?): List<CustomerModel> {
-        return customerService.getAll(name)
-    }
+//    @GetMapping
+//    fun getAll(@RequestParam name: String?): List<BookModel> {
+//        return bookService.getAll(name)
+//    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody customer: PostCustomerRequest) {
-        customerService.create(customer.toCustomerModel())
+    fun create(@RequestBody request: PostBookRequest) {
+        val customer = customerService.getById(request.customerId!!)
+
+        bookService.create(request.toBookModel(customer))
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.FOUND)
-    fun getById(@PathVariable id: Int): CustomerModel {
-        return customerService.getById(id)
+    fun getCustomer(@PathVariable id: Int): BookModel {
+        return bookService.getById(id)
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun update(@PathVariable id: Int, @RequestBody customer: PutCustomerRequest){
-        customerService.update(customer.toCustomerModel(id))
+    fun update(@PathVariable id: Int, @RequestBody book: PutBookRequest, customer: CustomerModel){
+        bookService.update(book.toBookModel(id, customer))
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: Int){
-        customerService.delete(id)
+        bookService.delete(id)
     }
 }

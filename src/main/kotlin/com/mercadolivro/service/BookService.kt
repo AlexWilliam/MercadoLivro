@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class BookService(
-    val bookRepository: BookRepository
+    val bookRepository: BookRepository,
+    val purchaseService: PurchaseService
 ) {
 
     fun findAll(pageable: Pageable): Page<BookModel> {
@@ -64,10 +65,15 @@ class BookService(
         return bookRepository.findAllById(bookIds).toList()
     }
 
-    fun purchase(books: MutableList<BookModel>) {
-        books.map{
+    fun purchase(books: MutableList<BookModel>?) {
+        books!!.map{
             it.status = BookStatus.VENDIDO
         }
         bookRepository.saveAll(books)
+    }
+
+    fun bookAvailable(id: Int?, status: BookStatus?): Boolean {
+        println(!bookRepository.existsByIdAndStatus(id, status))
+        return !bookRepository.existsByIdAndStatus(id, status)
     }
 }

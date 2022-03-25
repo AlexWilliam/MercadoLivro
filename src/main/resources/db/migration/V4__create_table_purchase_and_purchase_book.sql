@@ -1,10 +1,9 @@
 CREATE TABLE IF NOT EXISTS purchase(
     id int auto_increment primary key,
     customer_id int not null,
-    book_id int not null,
     nfe varchar(255),
     price decimal(10,2) not null,
-    createdAt DATETIME not null,
+    created_at DATETIME not null,
     FOREIGN KEY(customer_id) REFERENCES customer(id)
 );
 

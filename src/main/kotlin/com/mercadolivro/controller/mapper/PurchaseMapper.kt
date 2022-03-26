@@ -1,6 +1,7 @@
 package com.mercadolivro.controller.mapper
 
 import com.mercadolivro.controller.request.PostPurchaseRequest
+import com.mercadolivro.controller.response.PurchaseResponse
 import com.mercadolivro.model.PurchaseModel
 import com.mercadolivro.service.BookService
 import com.mercadolivro.service.CustomerService

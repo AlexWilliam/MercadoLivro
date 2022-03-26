@@ -15,18 +15,18 @@ data class PurchaseModel(
     var id: Int? = null,
 
     @ManyToOne
-    @JoinColumn(name="seller", updatable=false)
+    @JoinColumn(name="seller")
     var seller: CustomerModel,
+
+    @ManyToOne
+    @JoinColumn(name="buyer")
+    var buyer: CustomerModel,
 
     @ManyToMany
     @JoinTable(name="purchase_book",
         joinColumns = [JoinColumn(name="purchase_id")],
         inverseJoinColumns = [JoinColumn(name="book_id")])
     var books: MutableList<BookModel>,
-
-    @ManyToOne
-    @JoinColumn(name="buyer")
-    var buyer: CustomerModel,
 
     @Column
     var nfe: String? = null,
@@ -37,28 +37,4 @@ data class PurchaseModel(
     @Column
     val createdAt: LocalDateTime = LocalDateTime.now()
 ){
-//
-//    ? = null
-//        set(value){
-//            if(field!!.any { it.status == BookStatus.VENDIDO })
-//                throw BadRequestException(Errors.ML301.message, Errors.ML301.code)
-//
-//            if(field!!.any { it.status == BookStatus.CANCELADO || it.status == BookStatus.DELETADO})
-//                throw BadRequestException(Errors.ML302.message.format(BookStatus.CANCELADO, BookStatus.DELETADO), Errors.ML302.code)
-//
-//            field!!.add(value)
-//            println(field)
-//            println(value)
-//        }
-//    constructor(
-//        id: Int? = null,
-//        seller: CustomerModel,
-//        buyer: CustomerModel,
-//        nfe: String? = null,
-//        price: BigDecimal,
-//        books: MutableList<BookModel>?
-//    ): this(id, seller, buyer, nfe, price){
-//        this.books = books
-//        println(this)
-//    }
 }

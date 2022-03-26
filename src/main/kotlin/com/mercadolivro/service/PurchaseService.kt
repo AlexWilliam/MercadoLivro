@@ -2,6 +2,7 @@ package com.mercadolivro.service
 
 import com.mercadolivro.enums.BookStatus
 import com.mercadolivro.events.PurchaseEvent
+import com.mercadolivro.model.CustomerModel
 import com.mercadolivro.model.PurchaseModel
 import com.mercadolivro.repository.PurchaseRepository
 import org.springframework.context.ApplicationEventPublisher
@@ -24,11 +25,15 @@ class PurchaseService(
         purchaseRepository.save(purchaseModel)
     }
 
-    fun findBySeller(id: Int, pageable: Pageable): Page<PurchaseModel> {
-        return purchaseRepository.findBySeller(id, pageable)
+    fun findBySeller(seller: CustomerModel, pageable: Pageable): Page<PurchaseModel> {
+        return purchaseRepository.findBySeller(seller, pageable)
     }
 
-    fun findByBuyer(id: Int, pageable: Pageable): Page<PurchaseModel> {
-        return purchaseRepository.findByBuyer(id, pageable)
+    fun findByBuyer(buyer: CustomerModel, pageable: Pageable): Page<PurchaseModel> {
+        return purchaseRepository.findByBuyer(buyer, pageable)
+    }
+
+    fun findAll(pageable: Pageable): Page<PurchaseModel> {
+        return purchaseRepository.findAll(pageable)
     }
 }

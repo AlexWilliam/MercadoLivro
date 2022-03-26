@@ -7,10 +7,7 @@ import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
 
 abstract class BookAvailableValidator(var bookService: BookService): ConstraintValidator<BookAvailable, String> {
-    fun isBookAvailable(id: Int?, status: BookStatus): Boolean {
-        if(status.toString().isNullOrEmpty())
-            return false
-
-        return bookService.bookAvailable(id, status)
+    fun isBookAvailable(id: Int?): Boolean {
+        return bookService.bookAvailable(id)
     }
 }

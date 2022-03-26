@@ -15,8 +15,18 @@ data class PurchaseModel(
     var id: Int? = null,
 
     @ManyToOne
-    @JoinColumn(name="customer_id")
-    var customer: CustomerModel,
+    @JoinColumn(name="seller", updatable=false)
+    var seller: CustomerModel,
+
+    @ManyToMany
+    @JoinTable(name="purchase_book",
+        joinColumns = [JoinColumn(name="purchase_id")],
+        inverseJoinColumns = [JoinColumn(name="book_id")])
+    var books: MutableList<BookModel>,
+
+    @ManyToOne
+    @JoinColumn(name="buyer")
+    var buyer: CustomerModel,
 
     @Column
     var nfe: String? = null,
@@ -27,30 +37,28 @@ data class PurchaseModel(
     @Column
     val createdAt: LocalDateTime = LocalDateTime.now()
 ){
-
-    @ManyToMany
-    @JoinTable(name="purchase_book",
-        joinColumns = [JoinColumn(name="purchase_id")],
-        inverseJoinColumns = [JoinColumn(name="book_id")])
-    var books: MutableList<BookModel>? = null
-        set(value){
-            value!!.map {
-                if(it.status == BookStatus.VENDIDO){
-                    throw BadRequestException(Errors.ML301.message.format(it.id), Errors.ML301.code)
-                }
-                if(it.status == BookStatus.CANCELADO || it.status == BookStatus.DELETADO){
-                    throw BadRequestException(Errors.ML302.message.format(it.status), Errors.ML301.code)
-                }
-            }
-            field = value
-        }
-    constructor(
-        id: Int? = null,
-        customer: CustomerModel,
-        books: MutableList<BookModel>?,
-        nfe: String? = null,
-        price: BigDecimal
-    ): this(id, customer, nfe, price){
-        this.books = books
-    }
+//
+//    ? = null
+//        set(value){
+//            if(field!!.any { it.status == BookStatus.VENDIDO })
+//                throw BadRequestException(Errors.ML301.message, Errors.ML301.code)
+//
+//            if(field!!.any { it.status == BookStatus.CANCELADO || it.status == BookStatus.DELETADO})
+//                throw BadRequestException(Errors.ML302.message.format(BookStatus.CANCELADO, BookStatus.DELETADO), Errors.ML302.code)
+//
+//            field!!.add(value)
+//            println(field)
+//            println(value)
+//        }
+//    constructor(
+//        id: Int? = null,
+//        seller: CustomerModel,
+//        buyer: CustomerModel,
+//        nfe: String? = null,
+//        price: BigDecimal,
+//        books: MutableList<BookModel>?
+//    ): this(id, seller, buyer, nfe, price){
+//        this.books = books
+//        println(this)
+//    }
 }

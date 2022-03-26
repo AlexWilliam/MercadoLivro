@@ -9,8 +9,11 @@ class PostPurchaseRequest(
 
     @field:NotNull
     @field:Positive
-    @JsonAlias("customer_id")
-    val customerId: Int,
+    val seller: Int,
+
+    @field:NotNull
+    @field:Positive
+    val buyer: Int,
 
     @field:NotNull
     @JsonAlias("book_ids")

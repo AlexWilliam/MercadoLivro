@@ -2,6 +2,7 @@ package com.mercadolivro.service
 
 import com.mercadolivro.enums.BookStatus
 import com.mercadolivro.enums.Errors
+import com.mercadolivro.exception.BadRequestException
 import com.mercadolivro.exception.NotFoundException
 import com.mercadolivro.model.BookModel
 import com.mercadolivro.model.CustomerModel
@@ -12,8 +13,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class BookService(
-    val bookRepository: BookRepository,
-    val purchaseService: PurchaseService
+    val bookRepository: BookRepository
 ) {
 
     fun findAll(pageable: Pageable): Page<BookModel> {
@@ -72,8 +72,16 @@ class BookService(
         bookRepository.saveAll(books)
     }
 
-    fun bookAvailable(id: Int?, status: BookStatus?): Boolean {
-        println(!bookRepository.existsByIdAndStatus(id, status))
-        return !bookRepository.existsByIdAndStatus(id, status)
+    fun bookAvailable(id: Int?): Boolean {
+        if(bookRepository.existsByIdAndStatus(id, BookStatus.VENDIDO))
+            throw BadRequestException(Errors.ML301.message.format(id), Errors.ML301.code)
+
+        if(bookRepository.existsByIdAndStatus(id, BookStatus.CANCELADO))
+            throw BadRequestException(Errors.ML302.message.format(BookStatus.CANCELADO), Errors.ML302.code)
+
+        if(bookRepository.existsByIdAndStatus(id, BookStatus.DELETADO))
+            throw BadRequestException(Errors.ML302.message.format(BookStatus.DELETADO), Errors.ML302.code)
+
+        return !bookRepository.existsByIdAndStatus(id, BookStatus.ATIVO)
     }
 }

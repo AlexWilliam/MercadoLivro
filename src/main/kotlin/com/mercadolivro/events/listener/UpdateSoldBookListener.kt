@@ -15,6 +15,6 @@ class UpdateSoldBookListener(
     @Async
     @EventListener
     fun listen(purchaseEvent: PurchaseEvent){
-//        bookService.purchase(purchaseEvent.purchaseModel.books)
+        bookService.purchase(purchaseEvent.purchaseModel.books)
     }
 }

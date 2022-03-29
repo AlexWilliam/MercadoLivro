@@ -2,17 +2,20 @@ package com.mercadolivro.service
 
 import com.mercadolivro.enums.CustomerStatus
 import com.mercadolivro.enums.Errors
+import com.mercadolivro.enums.Roles
 import com.mercadolivro.exception.NotFoundException
 import com.mercadolivro.model.CustomerModel
 import com.mercadolivro.repository.CustomerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class CustomerService(
-    val customerRepository: CustomerRepository,
-    val bookService: BookService
+    private val customerRepository: CustomerRepository,
+    private val bookService: BookService,
+    private val bCrypt: BCryptPasswordEncoder
 ) {
 
     fun getAll(name: String?, pageable: Pageable): Page<CustomerModel> {
@@ -23,7 +26,13 @@ class CustomerService(
     }
 
     fun create(customer: CustomerModel) {
-        customerRepository.save(customer)
+
+        val customerCopy = customer.copy(
+            roles=setOf(Roles.CUSTOMER),
+            password = bCrypt.encode(customer.password)
+        )
+
+        customerRepository.save(customerCopy)
     }
 
     fun findById(id: Int): CustomerModel {

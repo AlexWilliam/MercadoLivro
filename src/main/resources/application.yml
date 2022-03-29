@@ -11,3 +11,7 @@ spring:
     password: "Legends@81043605"
   jackson:
     defaultPropertyInclusion: non_null
+
+jwt:
+  secret: 89521fce-6f78-4eb6-8c80-80f42ad9b99f
+  expiration: 999999

@@ -33,6 +33,10 @@ class SecurityConfig(
         "/customers"
     )
 
+    private val publicGetMatchers = arrayOf(
+        "/books"
+    )
+
     private val adminMatchers = arrayOf(
         "/admin/**"
     )
@@ -45,6 +49,7 @@ class SecurityConfig(
         http.cors().and().csrf().disable()
         http.authorizeHttpRequests()
             .antMatchers(HttpMethod.POST, *publicPostMatchers).permitAll()
+            .antMatchers(HttpMethod.GET, *publicGetMatchers).permitAll()
             .antMatchers(*adminMatchers).hasAuthority(Roles.ADMIN.description)
             .anyRequest().authenticated()
         http.addFilter(AuthenticationFilter(authenticationManager(), customerRepository, jwtUtil))
@@ -71,7 +76,7 @@ class SecurityConfig(
         val config = CorsConfiguration()
 
         config.allowCredentials = true
-        config.addAllowedOrigin("*")
+        config.addAllowedOriginPattern("*")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
         source.registerCorsConfiguration("/**", config)

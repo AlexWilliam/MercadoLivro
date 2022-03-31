@@ -2,7 +2,9 @@ package com.mercadolivro.controller
 
 import com.mercadolivro.controller.mapper.PurchaseMapper
 import com.mercadolivro.controller.request.PostPurchaseRequest
+import com.mercadolivro.controller.response.PageResponse
 import com.mercadolivro.controller.response.PurchaseResponse
+import com.mercadolivro.extension.toPageResponse
 import com.mercadolivro.extension.toResponse
 import com.mercadolivro.service.BookService
 import com.mercadolivro.service.CustomerService
@@ -34,19 +36,19 @@ class PurchaseController(
     }
 
     @GetMapping
-    fun findAll(@PageableDefault(page=0, size=10) pageable: Pageable): Page<PurchaseResponse> {
-        return purchaseService.findAll(pageable).map{ it.toResponse() }
+    fun findAll(@PageableDefault(page=0, size=10) pageable: Pageable): PageResponse<PurchaseResponse> {
+        return purchaseService.findAll(pageable).map{ it.toResponse() }.toPageResponse()
     }
 
     @GetMapping("/soldByCustomer/{id}")
-    fun findBySeller(@PathVariable id: Int, @PageableDefault(page=0, size=10) pageable: Pageable): Page<PurchaseResponse> {
+    fun findBySeller(@PathVariable id: Int, @PageableDefault(page=0, size=10) pageable: Pageable): PageResponse<PurchaseResponse> {
         var seller = customerService.findById(id)
-        return purchaseService.findBySeller(seller, pageable).map{ it.toResponse() }
+        return purchaseService.findBySeller(seller, pageable).map{ it.toResponse() }.toPageResponse()
     }
 
     @GetMapping("/broughtByCustomer/{id}")
-    fun findByBuyer(@PageableDefault(page=0, size=10) pageable: Pageable, @PathVariable id: Int): Page<PurchaseResponse> {
+    fun findByBuyer(@PageableDefault(page=0, size=10) pageable: Pageable, @PathVariable id: Int): PageResponse<PurchaseResponse> {
         var buyer = customerService.findById(id)
-        return purchaseService.findByBuyer(buyer, pageable).map{ it.toResponse() }
+        return purchaseService.findByBuyer(buyer, pageable).map{ it.toResponse() }.toPageResponse()
     }
 }

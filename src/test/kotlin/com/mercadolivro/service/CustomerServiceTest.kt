@@ -5,6 +5,7 @@ import com.mercadolivro.enums.Errors
 import com.mercadolivro.enums.Roles
 import com.mercadolivro.exception.NotFoundException
 import com.mercadolivro.extension.toPageResponse
+import com.mercadolivro.helper.buildCustomer
 import com.mercadolivro.model.CustomerModel
 import com.mercadolivro.repository.CustomerRepository
 import io.mockk.every
@@ -47,22 +48,19 @@ class CustomerServiceTest{
     fun `should return all customers`(){
 
         val fakeCustomers = listOf(
-            buildCustomer(1, "Alex William", "alex.william@email.com", "\$2a\$10\$80OScK/tyh2vs.TeDzYwnu9/ha.Vo3WmcN/y3SNed7KwYfWhL/Yoa"),
-            buildCustomer(2, "Alice Rubim", "alice.rubim@email.com", "\$2a\$10\$80OScK/tyh2vs.TeDzYwnu9/ha.Vo3WmcN/y3SNed7KwYfWhL/Yoa"),
-            buildCustomer(3, "Luna Francisca", "luna.fran@email.com", "$2a$10$80OScK/tyh2vs.TeDzYwnu9/ha.Vo3WmcN/y3SNed7KwYfWhL/Yoa"),
-            buildCustomer(5, "Luna Francisca", "luna.francisca@email.com", "$2a$10$80OScK/tyh2vs.TeDzYwnu9/ha.Vo3WmcN/y3SNed7KwYfWhL/Yoa"),
-            buildCustomer(6, "Luna Francisca", "luna.franciscacho@email.com", "$2a$10$80OScK/tyh2vs.TeDzYwnu9/ha.Vo3WmcN/y3SNed7KwYfWhL/Yoa")
+            buildCustomer(),
+            buildCustomer()
         )
 
-        val pageFakeCustomers = PageImpl<CustomerModel>(fakeCustomers.subList(0, 5))
+        val pageFakeCustomers = PageImpl<CustomerModel>(fakeCustomers.subList(0, 2))
 
-        every { customerRepository.findAll(Pageable.ofSize(10).withPage(0)) } returns pageFakeCustomers
+        every { customerRepository.findAll(Pageable.ofSize(2).withPage(0)) } returns pageFakeCustomers
 
-        val customers = customerService.getAll(null, Pageable.ofSize(10).withPage(0))
+        val customers = customerService.getAll(null, Pageable.ofSize(2).withPage(0))
 
-        assertEquals(fakeCustomers, customers)
-        verify(exactly = 1){ customerRepository.findAll(Pageable.ofSize(10).withPage(0)) }
-        verify(exactly = 0) { customerRepository.findByNameContaining(any(), Pageable.ofSize(10).withPage(0)) }
+        assertEquals(pageFakeCustomers, customers)
+        verify(exactly = 1){ customerRepository.findAll(Pageable.ofSize(2).withPage(0)) }
+        verify(exactly = 0) { customerRepository.findByNameContaining(any(), Pageable.ofSize(2).withPage(0)) }
     }
 
     @Test
@@ -71,7 +69,7 @@ class CustomerServiceTest{
         val name = "Alex"
 
         val fakeCustomers = listOf(
-            buildCustomer(1, "Alex William", "alex.william@email.com", "\$2a\$10\$80OScK/tyh2vs.TeDzYwnu9/ha.Vo3WmcN/y3SNed7KwYfWhL/Yoa")
+            buildCustomer()
         )
 
         val pageFakeCustomers = PageImpl<CustomerModel>(fakeCustomers.subList(0, 1))
@@ -80,9 +78,9 @@ class CustomerServiceTest{
 
         val customers = customerService.getAll(name, Pageable.ofSize(1).withPage(0))
 
-        assertEquals(fakeCustomers, customers)
-        verify(exactly = 0){ customerRepository.findAll(Pageable.ofSize(10).withPage(0)) }
-        verify(exactly = 1) { customerRepository.findByNameContaining(any(), Pageable.ofSize(10).withPage(0)) }
+        assertEquals(pageFakeCustomers, customers)
+        verify(exactly = 0){ customerRepository.findAll(Pageable.ofSize(1).withPage(0)) }
+        verify(exactly = 1) { customerRepository.findByNameContaining(name, Pageable.ofSize(1).withPage(0)) }
     }
 
     @Test
@@ -123,7 +121,7 @@ class CustomerServiceTest{
     fun `should throw not found exception customer find by id`(){
         val id = Random().nextInt()
 
-        every { customerRepository.findById(any()) } returns Optional.empty()
+        every { customerRepository.findById(id) } returns Optional.empty()
 
         val errors = assertThrows<NotFoundException>{ customerService.findById(id) }
 
@@ -156,12 +154,14 @@ class CustomerServiceTest{
         every { customerRepository.existsById(id) } returns false
         every { customerRepository.save(fakeCustomer) } returns fakeCustomer
 
-        val errors = assertThrows<NotFoundException>{ customerService.update(fakeCustomer) }
+        val errors = assertThrows<NotFoundException>{
+            customerService.update(fakeCustomer)
+        }
 
         assertEquals("Customer [${id}] not exists!", errors.message)
         assertEquals("ML-201", errors.errorCode)
-        verify(exactly = 1){ customerRepository.findById(id) }
-        verify(exactly = 0){ customerRepository.save(fakeCustomer) }
+        verify(exactly = 1){ customerRepository.existsById(id) }
+        verify(exactly = 0){ customerRepository.save(any()) }
     }
 
     @Test
@@ -220,18 +220,4 @@ class CustomerServiceTest{
         assertFalse(emailAvailable)
         verify(exactly = 1){ customerRepository.existsByEmail(email) }
     }
-
-    fun buildCustomer(
-        id: Int? = null,
-        name: String = "customer_name",
-        email: String = "${UUID.randomUUID()}@email.com",
-        password: String = "password"
-    ) = CustomerModel(
-        id = id,
-        name = name,
-        email = email,
-        status = CustomerStatus.ATIVO,
-        password = password,
-        roles = setOf(Roles.CUSTOMER)
-    )
 }

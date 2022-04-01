@@ -1,5 +1,6 @@
 package com.mercadolivro.security
 
+import com.mercadolivro.enums.Errors
 import com.mercadolivro.exception.AuthenticationException
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwt
@@ -42,7 +43,7 @@ class JWTUtil {
                 .parseClaimsJws(token)
                 .body
         }catch(ex: Exception){
-            throw AuthenticationException("Token inválido!", "99999")
+            throw AuthenticationException(Errors.ML000.message, Errors.ML000.code)
         }
     }
 
@@ -50,7 +51,7 @@ class JWTUtil {
         try{
             return getClaims(token).subject
         }catch(ex: Exception){
-            throw AuthenticationException("Token inválido!", "99999")
+            throw AuthenticationException(Errors.ML000.message, Errors.ML000.code)
         }
     }
 }

@@ -60,4 +60,16 @@ class ControllerAdvice {
 
         return ResponseEntity(error, HttpStatus.FORBIDDEN)
     }
+
+    @ExceptionHandler(AuthenticationException::class)
+    fun handleAuthenticationException(ex: AuthenticationException, request: WebRequest): ResponseEntity<ErrorResponse>{
+        val error = ErrorResponse(
+            HttpStatus.FORBIDDEN.value(),
+            Errors.ML000.message,
+            Errors.ML000.code,
+            null
+        )
+
+        return ResponseEntity(error, HttpStatus.FORBIDDEN)
+    }
 }
